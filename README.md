@@ -26,7 +26,7 @@ file that works without Python.
 Python 3.10 or newer.
 
 ```bash
-git clone <this-repo> ontology-visualiser
+git clone https://github.com/MuhammadAbdullah10/ontology-visualiser ontology-visualiser
 cd ontology-visualiser
 
 python -m venv .venv
