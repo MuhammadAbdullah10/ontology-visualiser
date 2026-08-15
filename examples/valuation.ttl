@@ -1,0 +1,248 @@
+@prefix ex:    <http://example.org/valuation#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/valuation>
+    a owl:Ontology ;
+    rdfs:label "Private Company Valuation Ontology" ;
+    rdfs:comment "A small worked example: companies, the valuations performed on them, and the methods those valuations use." .
+
+################################################################
+# Classes
+################################################################
+
+ex:Organisation a owl:Class ;
+    rdfs:label "Organisation" ;
+    rdfs:comment "Any legally constituted body." .
+
+ex:Company a owl:Class ;
+    rdfs:subClassOf ex:Organisation ;
+    rdfs:label "Company" ;
+    rdfs:comment "A privately held operating company that can be valued." .
+
+ex:Investor a owl:Class ;
+    rdfs:subClassOf ex:Organisation ;
+    rdfs:label "Investor" ;
+    rdfs:comment "A fund or individual holding securities in a company." .
+
+ex:Valuation a owl:Class ;
+    rdfs:label "Valuation" ;
+    rdfs:comment "A dated opinion of value for a company or a security class." .
+
+ex:ValuationMethod a owl:Class ;
+    rdfs:label "Valuation Method" ;
+    rdfs:comment "A technique used to derive value." .
+
+ex:GPC a owl:Class ;
+    rdfs:subClassOf ex:ValuationMethod ;
+    rdfs:label "Guideline Public Company" ;
+    skos:prefLabel "GPC" .
+
+ex:DCF a owl:Class ;
+    rdfs:subClassOf ex:ValuationMethod ;
+    rdfs:label "Discounted Cash Flow" ;
+    skos:prefLabel "DCF" .
+
+ex:Backsolve a owl:Class ;
+    rdfs:subClassOf ex:ValuationMethod ;
+    rdfs:label "Backsolve" ;
+    rdfs:comment "Calibrates value to the price of a recent financing round." ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty ex:calibratedTo ;
+        owl:someValuesFrom ex:FundingRound
+    ] .
+
+ex:FundingRound a owl:Class ;
+    rdfs:label "Funding Round" ;
+    rdfs:comment "A financing event in which securities are issued." .
+
+ex:SecurityClass a owl:Class ;
+    rdfs:label "Security Class" ;
+    rdfs:comment "A class of shares or instruments, e.g. Series B Preferred." .
+
+ex:Analyst a owl:Class ;
+    rdfs:label "Analyst" ;
+    rdfs:comment "The person responsible for a valuation." .
+
+ex:Report a owl:Class ;
+    rdfs:label "Report" ;
+    rdfs:comment "The deliverable document produced for a valuation or a round." .
+
+################################################################
+# Object properties
+################################################################
+
+ex:hasValuation a owl:ObjectProperty ;
+    rdfs:label "hasValuation" ;
+    rdfs:domain ex:Company ;
+    rdfs:range ex:Valuation ;
+    rdfs:comment "Links a company to a valuation performed on it." .
+
+ex:usesMethod a owl:ObjectProperty ;
+    rdfs:label "usesMethod" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range ex:ValuationMethod .
+
+ex:performedBy a owl:ObjectProperty ;
+    rdfs:label "performedBy" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range ex:Analyst .
+
+ex:valuesSecurity a owl:ObjectProperty ;
+    rdfs:label "valuesSecurity" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range ex:SecurityClass .
+
+ex:issuedBy a owl:ObjectProperty ;
+    rdfs:label "issuedBy" ;
+    rdfs:domain ex:SecurityClass ;
+    rdfs:range ex:Company .
+
+ex:raisedThrough a owl:ObjectProperty ;
+    rdfs:label "raisedThrough" ;
+    rdfs:domain ex:Company ;
+    rdfs:range ex:FundingRound .
+
+ex:participatesIn a owl:ObjectProperty ;
+    rdfs:label "participatesIn" ;
+    rdfs:domain ex:Investor ;
+    rdfs:range ex:FundingRound .
+
+ex:issuesSecurity a owl:ObjectProperty ;
+    rdfs:label "issuesSecurity" ;
+    rdfs:domain ex:FundingRound ;
+    rdfs:range ex:SecurityClass .
+
+# A union domain: both valuations and rounds can be documented.
+ex:documentedIn a owl:ObjectProperty ;
+    rdfs:label "documentedIn" ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( ex:Valuation ex:FundingRound ) ] ;
+    rdfs:range ex:Report .
+
+# Only ever used inside an owl:Restriction — no domain/range of its own.
+ex:calibratedTo a owl:ObjectProperty ;
+    rdfs:label "calibratedTo" ;
+    rdfs:comment "Anchors a method to an observed transaction." .
+
+################################################################
+# Datatype properties
+################################################################
+
+ex:organisationName a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:domain ex:Organisation ;
+    rdfs:range xsd:string .
+
+ex:jurisdiction a owl:DatatypeProperty ;
+    rdfs:label "jurisdiction" ;
+    rdfs:domain ex:Organisation ;
+    rdfs:range xsd:string .
+
+ex:companyId a owl:DatatypeProperty ;
+    rdfs:label "id" ;
+    rdfs:domain ex:Company ;
+    rdfs:range xsd:string .
+
+ex:sector a owl:DatatypeProperty ;
+    rdfs:label "sector" ;
+    rdfs:domain ex:Company ;
+    rdfs:range xsd:string .
+
+ex:currency a owl:DatatypeProperty ;
+    rdfs:label "currency" ;
+    rdfs:domain ex:Company ;
+    rdfs:range xsd:string .
+
+ex:revenue a owl:DatatypeProperty ;
+    rdfs:label "revenue" ;
+    rdfs:domain ex:Company ;
+    rdfs:range xsd:decimal .
+
+ex:foundedDate a owl:DatatypeProperty ;
+    rdfs:label "foundedDate" ;
+    rdfs:domain ex:Company ;
+    rdfs:range xsd:date .
+
+ex:valuationDate a owl:DatatypeProperty ;
+    rdfs:label "valuationDate" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range xsd:date .
+
+ex:enterpriseValue a owl:DatatypeProperty ;
+    rdfs:label "enterpriseValue" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range xsd:decimal .
+
+ex:equityValue a owl:DatatypeProperty ;
+    rdfs:label "equityValue" ;
+    rdfs:domain ex:Valuation ;
+    rdfs:range xsd:decimal .
+
+# Deliberately has no rdfs:range: the viewer shows the name only.
+ex:internalNote a owl:DatatypeProperty ;
+    rdfs:label "internalNote" ;
+    rdfs:domain ex:Valuation .
+
+ex:methodWeighting a owl:DatatypeProperty ;
+    rdfs:label "weighting" ;
+    rdfs:domain ex:ValuationMethod ;
+    rdfs:range xsd:decimal .
+
+ex:discountRate a owl:DatatypeProperty ;
+    rdfs:label "discountRate" ;
+    rdfs:domain ex:DCF ;
+    rdfs:range xsd:decimal .
+
+ex:volatility a owl:DatatypeProperty ;
+    rdfs:label "volatility" ;
+    rdfs:domain ex:Backsolve ;
+    rdfs:range xsd:decimal .
+
+ex:multipleType a owl:DatatypeProperty ;
+    rdfs:label "multipleType" ;
+    rdfs:domain ex:GPC ;
+    rdfs:range xsd:string .
+
+ex:roundDate a owl:DatatypeProperty ;
+    rdfs:label "roundDate" ;
+    rdfs:domain ex:FundingRound ;
+    rdfs:range xsd:date .
+
+ex:amountRaised a owl:DatatypeProperty ;
+    rdfs:label "amountRaised" ;
+    rdfs:domain ex:FundingRound ;
+    rdfs:range xsd:decimal .
+
+ex:liquidationPreference a owl:DatatypeProperty ;
+    rdfs:label "liquidationPreference" ;
+    rdfs:domain ex:SecurityClass ;
+    rdfs:range xsd:decimal .
+
+ex:seniority a owl:DatatypeProperty ;
+    rdfs:label "seniority" ;
+    rdfs:domain ex:SecurityClass ;
+    rdfs:range xsd:integer .
+
+ex:analystEmail a owl:DatatypeProperty ;
+    rdfs:label "email" ;
+    rdfs:domain ex:Analyst ;
+    rdfs:range xsd:string .
+
+ex:reportTitle a owl:DatatypeProperty ;
+    rdfs:label "title" ;
+    rdfs:domain ex:Report ;
+    rdfs:range xsd:string .
+
+ex:publishedOn a owl:DatatypeProperty ;
+    rdfs:label "publishedOn" ;
+    rdfs:domain ex:Report ;
+    rdfs:range xsd:dateTime .
+
+# No domain at all: stays searchable, but is not placed on the graph.
+ex:legacyCode a owl:DatatypeProperty ;
+    rdfs:label "legacyCode" ;
+    rdfs:range xsd:string .

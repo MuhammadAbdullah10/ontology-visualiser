@@ -1,0 +1,94 @@
+# A deliberately different modelling style from valuation.ttl:
+# the object properties carry no rdfs:domain or rdfs:range at all, and every
+# class-to-class link is expressed as an owl:Restriction. The parser reads the
+# relationships out of the restrictions, so the graph is still complete.
+
+@prefix ex:   <http://example.org/manufacturing#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/manufacturing>
+    a owl:Ontology ;
+    rdfs:label "Factory Maintenance Ontology" .
+
+ex:Asset a owl:Class ;
+    rdfs:label "Asset" .
+
+ex:Plant a owl:Class ;
+    rdfs:subClassOf ex:Asset ;
+    rdfs:label "Plant" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty ex:contains ;
+        owl:someValuesFrom ex:ProductionLine ] .
+
+ex:ProductionLine a owl:Class ;
+    rdfs:subClassOf ex:Asset ;
+    rdfs:label "Production Line" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty ex:contains ;
+        owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass ex:Machine ] .
+
+ex:Machine a owl:Class ;
+    rdfs:subClassOf ex:Asset ;
+    rdfs:label "Machine" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty ex:hasPart ;
+        owl:someValuesFrom ex:Part ] ,
+        [ a owl:Restriction ;
+        owl:onProperty ex:underwent ;
+        owl:allValuesFrom ex:MaintenanceEvent ] .
+
+ex:Part a owl:Class ;
+    rdfs:label "Part" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty ex:suppliedBy ;
+        owl:someValuesFrom ex:Supplier ] .
+
+ex:Supplier a owl:Class ;
+    rdfs:label "Supplier" .
+
+ex:MaintenanceEvent a owl:Class ;
+    rdfs:label "Maintenance Event" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+        owl:onProperty ex:carriedOutBy ;
+        owl:someValuesFrom ex:Technician ] .
+
+ex:Inspection a owl:Class ;
+    rdfs:subClassOf ex:MaintenanceEvent ;
+    rdfs:label "Inspection" .
+
+ex:Repair a owl:Class ;
+    rdfs:subClassOf ex:MaintenanceEvent ;
+    rdfs:label "Repair" .
+
+ex:Technician a owl:Class ;
+    rdfs:label "Technician" .
+
+# Object properties with no domain/range: only the restrictions place them.
+ex:contains     a owl:ObjectProperty ; rdfs:label "contains" .
+ex:hasPart      a owl:ObjectProperty ; rdfs:label "hasPart" .
+ex:underwent    a owl:ObjectProperty ; rdfs:label "underwent" .
+ex:suppliedBy   a owl:ObjectProperty ; rdfs:label "suppliedBy" .
+ex:carriedOutBy a owl:ObjectProperty ; rdfs:label "carriedOutBy" .
+
+# Attributes, in the ordinary domain/range style.
+ex:assetTag    a owl:DatatypeProperty ; rdfs:label "assetTag" ;
+               rdfs:domain ex:Asset ; rdfs:range xsd:string .
+ex:installedOn a owl:DatatypeProperty ; rdfs:label "installedOn" ;
+               rdfs:domain ex:Asset ; rdfs:range xsd:date .
+ex:siteCode    a owl:DatatypeProperty ; rdfs:label "siteCode" ;
+               rdfs:domain ex:Plant ; rdfs:range xsd:string .
+ex:throughput  a owl:DatatypeProperty ; rdfs:label "throughput" ;
+               rdfs:domain ex:ProductionLine ; rdfs:range xsd:decimal .
+ex:serial      a owl:DatatypeProperty ; rdfs:label "serialNumber" ;
+               rdfs:domain ex:Machine ; rdfs:range xsd:string .
+ex:partNumber  a owl:DatatypeProperty ; rdfs:label "partNumber" ;
+               rdfs:domain ex:Part ; rdfs:range xsd:string .
+ex:eventDate   a owl:DatatypeProperty ; rdfs:label "eventDate" ;
+               rdfs:domain ex:MaintenanceEvent ; rdfs:range xsd:dateTime .
+ex:downtime    a owl:DatatypeProperty ; rdfs:label "downtimeMinutes" ;
+               rdfs:domain ex:MaintenanceEvent ; rdfs:range xsd:integer .
+ex:certifiedFor a owl:DatatypeProperty ; rdfs:label "certification" ;
+               rdfs:domain ex:Technician ; rdfs:range xsd:string .

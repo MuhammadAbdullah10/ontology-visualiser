@@ -1,0 +1,5 @@
+# Core: RDF/OWL parsing and the Streamlit shell.
+rdflib>=7.0,<8.0
+streamlit>=1.32
+
+# Development only (tests). Install with: pip install -r requirements.txt -r requirements-dev.txt

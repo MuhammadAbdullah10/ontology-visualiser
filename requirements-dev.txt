@@ -1,0 +1,3 @@
+# Test tooling. The JavaScript suite additionally needs Node 18+ and jsdom:
+#   npm install jsdom
+pytest>=8.0
